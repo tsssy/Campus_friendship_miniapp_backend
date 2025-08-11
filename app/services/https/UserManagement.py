@@ -131,7 +131,7 @@ class UserManagement:
                     # 使用 user_id 作为 MongoDB 的 _id
                     user_dict = {
                         "_id": user.user_id,
-                        "telegram_user_name": user.telegram_user_name,
+                        "user_name": user.telegram_user_name,
                         "gender": user.gender,
                         "age": user.age,
                         "target_gender": user.target_gender,
@@ -176,7 +176,7 @@ class UserManagement:
             # 使用 user_id 作为 MongoDB 的 _id
             user_dict = {
                 "_id": user.user_id,
-                "telegram_user_name": user.telegram_user_name,
+                "user_name": user.telegram_user_name,
                 "gender": user.gender,
                 "age": user.age,
                 "target_gender": user.target_gender,
@@ -215,13 +215,12 @@ class UserManagement:
         if not user:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="用户不存在")
         return {
-            "telegram_user_name": user.telegram_user_name,
-            "telegram_id": user.user_id,
+            "user_name": user.telegram_user_name,
+            "user_id": user.user_id,
             "gender": user.gender,
             "age": user.age,
             "target_gender": user.target_gender,
             "user_personality_trait": user.user_personality_summary,
-            "user_id": user.user_id,
             "match_ids": user.match_ids
         }
 

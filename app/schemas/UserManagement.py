@@ -3,8 +3,8 @@ from typing import Optional, List
 
 # 创建新用户
 class CreateNewUserRequest(BaseModel):
-    telegram_user_name: str = Field(..., description="用户的 Telegram 用户名")
-    telegram_user_id: str = Field(..., description="用户的 Telegram ID 或 openid（字符串）")
+    user_name: str = Field(..., description="用户名称（字符串）")
+    user_id: str = Field(..., description="用户ID（字符串，存 openid）")
     gender: int = Field(..., description="用户性别 1/2/3")
     
     @validator('gender')
@@ -62,8 +62,7 @@ class GetUserInfoWithUserIdRequest(BaseModel):
 
 class GetUserInfoWithUserIdResponse(BaseModel):
     user_id: str = Field(..., description="用户ID（字符串）")
-    telegram_user_name: str = Field(..., description="用户的 Telegram 用户名")
-    telegram_id: str = Field(..., description="用户的 Telegram ID（字符串）")
+    user_name: str = Field(..., description="用户名称（字符串）")
     gender: int = Field(..., description="用户性别 1/2/3")
     age: Optional[int] = Field(None, description="用户年龄")
     target_gender: Optional[int] = Field(None, description="用户目标性别 1/2/3")

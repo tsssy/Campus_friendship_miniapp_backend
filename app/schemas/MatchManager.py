@@ -3,8 +3,8 @@ from typing import Optional, Dict
 
 # 创建匹配
 class CreateMatchRequest(BaseModel):
-    user_id_1: int = Field(..., description="第一个用户ID")
-    user_id_2: int = Field(..., description="第二个用户ID")
+    user_id_1: str = Field(..., description="第一个用户ID（字符串）")
+    user_id_2: str = Field(..., description="第二个用户ID（字符串）")
     reason_1: str = Field(..., description="给用户1的匹配原因")
     reason_2: str = Field(..., description="给用户2的匹配原因")
     match_score: int = Field(..., description="匹配分数")
@@ -15,11 +15,11 @@ class CreateMatchResponse(BaseModel):
 
 # 获取匹配信息
 class GetMatchInfoRequest(BaseModel):
-    user_id: int = Field(..., description="请求用户ID")
+    user_id: str = Field(..., description="请求用户ID（字符串）")
     match_id: int = Field(..., description="匹配ID")
 
 class GetMatchInfoResponse(BaseModel):
-    target_user_id: int = Field(..., description="目标用户ID")
+    target_user_id: str = Field(..., description="目标用户ID（字符串）")
     description_for_target: str = Field(..., description="给目标用户的描述")
     is_liked: bool = Field(..., description="是否已点赞")
     match_score: int = Field(..., description="匹配分数")
@@ -42,7 +42,7 @@ class SaveMatchToDatabaseResponse(BaseModel):
 
 # 🔧 MODIFIED: 新增 - 获取所有女性用户匹配
 class GetNewMatchesForEveryoneRequest(BaseModel):
-    user_id: Optional[int] = Field(None, description="用户ID，如果提供则只为该用户匹配")
+    user_id: Optional[str] = Field(None, description="用户ID（字符串），如果提供则只为该用户匹配")
     print_message: bool = Field(..., description="是否打印详细消息")
 
 class GetNewMatchesForEveryoneResponse(BaseModel):

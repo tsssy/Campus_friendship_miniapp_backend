@@ -42,13 +42,14 @@ class Match:
             cls._initialized = True
             logger.warning(f"Using timestamp as match counter starting point: {cls._match_counter}")
     
-    def __init__(self, telegram_user_session_id_1: int, telegram_user_session_id_2: int, reason_to_id_1: str, reason_to_id_2: str, match_score: int, match_time: str):
+    def __init__(self, telegram_user_session_id_1: str, telegram_user_session_id_2: str, reason_to_id_1: str, reason_to_id_2: str, match_score: int, match_time: str):
         # 确保计数器已初始化
         if not Match._initialized:
             raise RuntimeError("Match counter not initialized. Call Match.initialize_counter() first.")
             
         Match._match_counter += 1
         self.match_id = Match._match_counter
+        # 中文注释：匹配的两个用户ID改为字符串（openid）
         self.user_id_1 = telegram_user_session_id_1
         self.user_id_2 = telegram_user_session_id_2
         self.description_to_user_1 = reason_to_id_1  # String description
@@ -89,7 +90,7 @@ class Match:
             self.user_1 = None
             self.user_2 = None
 
-    def get_target_user(self, user_id: int):
+    def get_target_user(self, user_id: str):
         """
         根据给定的user_id返回另一个用户实例
         """
@@ -101,7 +102,7 @@ class Match:
             logger.error(f"User ID {user_id} not found in match {self.match_id}")
             return None
 
-    def get_reason_for_profile(self, user_id: int) -> Optional[str]:
+    def get_reason_for_profile(self, user_id: str) -> Optional[str]:
         """
         获取针对特定用户的匹配原因
         """
@@ -170,7 +171,7 @@ class Match:
             logger.error(f"Error saving match {self.match_id} to database: {e}")
             return False
     
-    def get_target_user_id(self, user_id: int) -> Optional[int]:
+    def get_target_user_id(self, user_id: str) -> Optional[str]:
         """
         获取目标用户ID
         """

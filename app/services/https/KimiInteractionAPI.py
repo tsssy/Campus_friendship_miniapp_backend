@@ -86,7 +86,7 @@ class KimiInteractionAPI:
         
         return messages
     
-    async def send_message_to_ai(self, user_id: int, message: str, history: list, gender: str = "neutral") -> dict:
+    async def send_message_to_ai(self, user_id: str, message: str, history: list, gender: str = "neutral") -> dict:
         """
         向Kimi API发送消息并获取响应
         
@@ -163,7 +163,7 @@ class KimiInteractionAPI:
             logger.error(f"[{user_id}] 处理用户消息失败: {str(e)}", exc_info=True)
             return await self.get_fallback_response()
     
-    def _make_api_request(self, request_data: dict, user_id: int) -> dict:
+    def _make_api_request(self, request_data: dict, user_id: str) -> dict:
         """
         向Kimi API发送请求（包含重试机制）
         
@@ -413,7 +413,7 @@ class KimiInteractionAPI:
             "timestamp": datetime.now().isoformat()
         }
     
-    async def _get_mock_response(self, user_id: int, message: str, history: list) -> dict:
+    async def _get_mock_response(self, user_id: str, message: str, history: list) -> dict:
         """
         获取模拟响应（用于测试）
         

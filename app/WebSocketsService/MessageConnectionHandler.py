@@ -54,10 +54,10 @@ class MessageConnectionHandler(ConnectionHandler):
                 }))
                 return
             
-            # 统一转换为int类型
+            # 中文注释：仅 match_id 转为数字，用户ID保持字符串
             try:
-                current_user_id = int(self.user_id)
-                target_user_id = int(target_user_id)
+                current_user_id = str(self.user_id)
+                target_user_id = str(target_user_id)
                 match_id = int(match_id)
             except (ValueError, TypeError) as e:
                 await self.websocket.send_text(json.dumps({
@@ -156,10 +156,10 @@ class MessageConnectionHandler(ConnectionHandler):
                 }))
                 return
             
-            # 统一转换为int类型
+            # 中文注释：仅 chatroom_id 转为数字，用户ID保持字符串
             try:
-                current_user_id = int(self.user_id)
-                target_user_id = int(target_user_id)
+                current_user_id = str(self.user_id)
+                target_user_id = str(target_user_id)
                 chatroom_id = int(chatroom_id)
             except (ValueError, TypeError) as e:
                 await self.websocket.send_text(json.dumps({

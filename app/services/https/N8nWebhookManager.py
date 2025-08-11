@@ -20,7 +20,7 @@ class N8nWebhookManager:
             self.base_url = "http://8.216.32.239:5678/webhook/match"
             N8nWebhookManager._initialized = True
         
-    async def request_matches(self, user_id: int, num_of_matches: int = 1) -> List[Dict]:
+    async def request_matches(self, user_id: str, num_of_matches: int = 1) -> List[Dict]:
         """
         Request matches from n8n webhook workflow
         
@@ -63,7 +63,7 @@ class N8nWebhookManager:
             logger.error(f"Unexpected error in request_matches: {e}")
             raise
     
-    def sync_request_matches(self, user_id: int, num_of_matches: int = 1) -> List[Dict]:
+    def sync_request_matches(self, user_id: str, num_of_matches: int = 1) -> List[Dict]:
         """
         Synchronous version of request_matches for non-async contexts
         

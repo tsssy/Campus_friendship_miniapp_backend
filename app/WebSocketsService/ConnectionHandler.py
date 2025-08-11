@@ -120,15 +120,8 @@ class ConnectionHandler:
             print(f"🔍 [DEBUG] UserManagement user_list length: {len(user_manager.user_list)}")
             print(f"🔍 [DEBUG] UserManagement user_list keys (first 5): {list(user_manager.user_list.keys())[:5]}")
             
-            # 转换用户ID为int类型进行查找（因为缓存中的键是int）
-            try:
-                user_id_for_lookup = int(user_id_input)
-                print(f"🔍 [DEBUG] Successfully converted '{user_id_input}' to int: {user_id_for_lookup}")
-            except (ValueError, TypeError) as e:
-                print(f"❌ [DEBUG] Failed to convert '{user_id_input}' to int: {e}")
-                logging.warning(f"Authentication failed: user_id '{user_id_input}' cannot be converted to int")
-                return False
-            
+            # 中文注释：不再转换为整数，直接按字符串ID查找
+            user_id_for_lookup = str(user_id_input)
             print(f"🔍 [DEBUG] Looking up user with ID: {user_id_for_lookup} (type: {type(user_id_for_lookup)})")
             user_instance = user_manager.get_user_instance(user_id_for_lookup)
             print(f"🔍 [DEBUG] get_user_instance returned: {user_instance}")

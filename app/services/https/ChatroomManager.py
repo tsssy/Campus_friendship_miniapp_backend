@@ -51,17 +51,15 @@ class ChatroomManager:
                     
                     logger.info(f"ChatroomManager construct: Processing chatroom {chatroom_id} (users: {user1_id}, {user2_id}, match_id: {match_id})")
                     
-                    # 统一转换为int类型
+                    # 中文注释：仅 chatroom_id、match_id 为数字，用户ID保持为字符串
                     chatroom_id = int(chatroom_id)
-                    user1_id = int(user1_id)
-                    user2_id = int(user2_id)
                     if match_id is not None:
                         match_id = int(match_id)
                     
                     # Get user instances
                     user_manager = UserManagement()
-                    user1 = user_manager.get_user_instance(user1_id)
-                    user2 = user_manager.get_user_instance(user2_id)
+                    user1 = user_manager.get_user_instance(str(user1_id))
+                    user2 = user_manager.get_user_instance(str(user2_id))
                     
                     if user1 and user2:
                         # Create chatroom instance with existing ID
@@ -93,9 +91,7 @@ class ChatroomManager:
         Returns chatroom_id
         """
         try:
-            # 统一转换为int类型
-            user_id_1 = int(user_id_1)
-            user_id_2 = int(user_id_2)
+            # 中文注释：仅 match_id 为数字，用户ID保持为字符串
             match_id = int(match_id)
             
             # Debug: 打印ChatroomManager初始状态
@@ -122,8 +118,8 @@ class ChatroomManager:
             # Get user instances
             user_manager = UserManagement()
             
-            user1 = user_manager.get_user_instance(user_id_1)
-            user2 = user_manager.get_user_instance(user_id_2)
+            user1 = user_manager.get_user_instance(str(user_id_1))
+            user2 = user_manager.get_user_instance(str(user_id_2))
             
             logger.info(f"STEP 1.3.2: user1 result: {user1 is not None}, user2 result: {user2 is not None}")
             if user1:
@@ -180,9 +176,9 @@ class ChatroomManager:
         Returns list of (message, datetime, sender_id, sender_name)
         """
         try:
-            # 统一转换为int类型
+            # 中文注释：chatroom_id 为数字，用户ID保持为字符串
             chatroom_id = int(chatroom_id)
-            user_id = int(user_id)
+            user_id = str(user_id)
             
             logger.info(f"STEP 2.1: Getting chatroom {chatroom_id} from memory")
             
@@ -219,7 +215,7 @@ class ChatroomManager:
                     if message_data:
                         # Get sender user instance for sender name
                         user_manager = UserManagement()
-                        sender_user = user_manager.get_user_instance(message_data["message_sender_id"])
+                        sender_user = user_manager.get_user_instance(str(message_data["message_sender_id"]))
                         sender_name = sender_user.telegram_user_name if sender_user else f"User{message_data['message_sender_id']}"
                         
                         # Create message tuple: (message_content, datetime_utc, sender_id, sender_name)
@@ -246,7 +242,7 @@ class ChatroomManager:
             chat_history = []
             for message_content, datetime_utc, sender_id, sender_name in messages:
                 # Replace sender name with "I" if it's the requesting user
-                display_name = "I" if sender_id == user_id else sender_name
+                display_name = "I" if str(sender_id) == str(user_id) else sender_name
                 
                 chat_history.append((
                     message_content,
@@ -269,9 +265,9 @@ class ChatroomManager:
         Returns dict with success status and match_id
         """
         try:
-            # 统一转换为int类型
+            # 中文注释：chatroom_id 为数字，用户ID保持为字符串
             chatroom_id = int(chatroom_id)
-            sender_user_id = int(sender_user_id)
+            sender_user_id = str(sender_user_id)
             
             logger.info(f"SEND MSG STEP 1: Sending message in chatroom {chatroom_id} from user {sender_user_id}")
             
@@ -285,16 +281,16 @@ class ChatroomManager:
             
             # Get sender user instance
             user_manager = UserManagement()
-            sender_user = user_manager.get_user_instance(sender_user_id)
+            sender_user = user_manager.get_user_instance(str(sender_user_id))
             if not sender_user:
                 logger.error(f"SEND MSG STEP 2 FAILED: Sender user {sender_user_id} not found")
                 return {"success": False, "match_id": None}
             
             # Determine receiver user (the other user in the chatroom)
-            if sender_user_id == chatroom.user1_id:
+            if str(sender_user_id) == str(chatroom.user1_id):
                 receiver_user = chatroom.user2
                 receiver_user_id = chatroom.user2_id
-            elif sender_user_id == chatroom.user2_id:
+            elif str(sender_user_id) == str(chatroom.user2_id):
                 receiver_user = chatroom.user1
                 receiver_user_id = chatroom.user1_id
             else:

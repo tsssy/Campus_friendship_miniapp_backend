@@ -44,7 +44,7 @@ class Post:
 
     def __init__(
         self,
-        creator_user_id: int,
+        creator_user_id: str,
         creator_user_name: str,
         post_content: str,
         post_type: str = "text",
@@ -62,7 +62,8 @@ class Post:
         # 基础内容
         self.post_content: str = post_content
         self.post_type: str = post_type  # text | image | text_image
-        self.creator_user_id: int = creator_user_id
+        # 中文注释：发布者用户ID改为字符串（openid），但贴子本身ID仍为数字
+        self.creator_user_id: str = creator_user_id
         self.creator_user_name: str = creator_user_name
 
         # 媒体与分类
@@ -74,7 +75,8 @@ class Post:
         self.like_count: int = 0
         self.comment_count: int = 0
         self.view_count: int = 0
-        self.liked_user_ids: List[int] = []
+        # 中文注释：点赞用户ID列表改为字符串列表
+        self.liked_user_ids: List[str] = []
         self.comment_ids: List[int] = []
 
         # 状态与时间
@@ -124,7 +126,7 @@ class Post:
             logger.error(f"Error saving post {self.post_id}: {e}")
             return False
 
-    async def add_like(self, user_id: int) -> bool:
+    async def add_like(self, user_id: str) -> bool:
         """添加点赞（同时更新计数）"""
         if user_id not in self.liked_user_ids:
             self.liked_user_ids.append(user_id)
@@ -133,7 +135,7 @@ class Post:
             return await self.save_to_database()
         return True
 
-    async def remove_like(self, user_id: int) -> bool:
+    async def remove_like(self, user_id: str) -> bool:
         """取消点赞（同时更新计数）"""
         if user_id in self.liked_user_ids:
             self.liked_user_ids.remove(user_id)

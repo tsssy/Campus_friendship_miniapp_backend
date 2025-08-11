@@ -4,7 +4,7 @@ from typing import Optional, List
 # 创建新用户
 class CreateNewUserRequest(BaseModel):
     telegram_user_name: str = Field(..., description="用户的 Telegram 用户名")
-    telegram_user_id: int = Field(..., description="用户的 Telegram ID")
+    telegram_user_id: str = Field(..., description="用户的 Telegram ID 或 openid（字符串）")
     gender: int = Field(..., description="用户性别 1/2/3")
     
     @validator('gender')
@@ -16,11 +16,11 @@ class CreateNewUserRequest(BaseModel):
 
 class CreateNewUserResponse(BaseModel):
     success: bool = Field(..., description="是否创建成功")
-    user_id: int = Field(..., description="新用户的唯一ID") 
+    user_id: str = Field(..., description="新用户的唯一ID（字符串）") 
 
 # 编辑用户年龄
 class EditUserAgeRequest(BaseModel):
-    user_id: int = Field(..., description="用户ID")
+    user_id: str = Field(..., description="用户ID（字符串）")
     age: int = Field(..., description="用户年龄")
 
 class EditUserAgeResponse(BaseModel):
@@ -28,7 +28,7 @@ class EditUserAgeResponse(BaseModel):
 
 # 编辑用户目标性别
 class EditTargetGenderRequest(BaseModel):
-    user_id: int = Field(..., description="用户ID")
+    user_id: str = Field(..., description="用户ID（字符串）")
     target_gender: int = Field(..., description="用户目标性别 1/2/3")
     
     @validator('target_gender')
@@ -43,7 +43,7 @@ class EditTargetGenderResponse(BaseModel):
 
 # 编辑用户简介
 class EditSummaryRequest(BaseModel):
-    user_id: int = Field(..., description="用户ID")
+    user_id: str = Field(..., description="用户ID（字符串）")
     summary: str = Field(..., description="用户简介")
 
 class EditSummaryResponse(BaseModel):
@@ -51,19 +51,19 @@ class EditSummaryResponse(BaseModel):
 
 # 保存用户信息到数据库
 class SaveUserInfoToDatabaseRequest(BaseModel):
-    user_id: Optional[int] = Field(None, description="用户ID，如果不提供则保存所有用户")
+    user_id: Optional[str] = Field(None, description="用户ID（字符串），如果不提供则保存所有用户")
 
 class SaveUserInfoToDatabaseResponse(BaseModel):
     success: bool = Field(..., description="是否保存成功")
 
 # 根据用户id获取用户信息
 class GetUserInfoWithUserIdRequest(BaseModel):
-    user_id: int = Field(..., description="用户ID")
+    user_id: str = Field(..., description="用户ID（字符串）")
 
 class GetUserInfoWithUserIdResponse(BaseModel):
-    user_id: int = Field(..., description="用户ID")
+    user_id: str = Field(..., description="用户ID（字符串）")
     telegram_user_name: str = Field(..., description="用户的 Telegram 用户名")
-    telegram_id: int = Field(..., description="用户的 Telegram ID")
+    telegram_id: str = Field(..., description="用户的 Telegram ID（字符串）")
     gender: int = Field(..., description="用户性别 1/2/3")
     age: Optional[int] = Field(None, description="用户年龄")
     target_gender: Optional[int] = Field(None, description="用户目标性别 1/2/3")
@@ -86,7 +86,7 @@ class GetUserInfoWithUserIdResponse(BaseModel):
 
 # 用户注销
 class DeactivateUserRequest(BaseModel):
-    user_id: int = Field(..., description="要注销的用户ID")
+    user_id: str = Field(..., description="要注销的用户ID（字符串）")
 
 class DeactivateUserResponse(BaseModel):
     success: bool = Field(..., description="是否注销成功")

@@ -56,7 +56,7 @@ class AnswerRecord(BaseModel):
 
 class StartTestRequest(BaseModel):
     """开始测试请求模型"""
-    user_id: int = Field(..., description="用户ID", example=12345)
+    user_id: str = Field(..., description="用户ID（字符串）", example="wx_openid_xxx")
 
 class SubmitAnswerRequest(BaseModel):
     """提交答案请求模型"""
@@ -99,7 +99,7 @@ class TestHistoryResponse(BaseModel):
 class TestSession(BaseModel):
     """测试会话内部模型"""
     session_id: str = Field(..., description="会话ID")
-    user_id: int = Field(..., description="用户ID")
+    user_id: str = Field(..., description="用户ID（字符串）")
     answers: List[AnswerRecord] = Field(default_factory=list, description="答案记录列表")
     scores: Dict[str, int] = Field(default_factory=dict, description="各人格类型得分")
     result_card: Optional[str] = Field(None, description="结果卡片ID")

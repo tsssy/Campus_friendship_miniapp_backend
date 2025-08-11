@@ -37,7 +37,7 @@ class Comment:
             cls._comment_counter = int(time.time() * 1000)
             cls._initialized = True
 
-    def __init__(self, commenter_user_id: int, commenter_user_name: str, post_id: int, comment_content: str) -> None:
+    def __init__(self, commenter_user_id: str, commenter_user_name: str, post_id: int, comment_content: str) -> None:
         # 确保计数器已初始化
         if not Comment._initialized:
             raise RuntimeError("Comment counter not initialized. Call Comment.initialize_counter() first.")
@@ -48,12 +48,14 @@ class Comment:
         # 基础内容
         self.post_id: int = post_id
         self.comment_content: str = comment_content
-        self.commenter_user_id: int = commenter_user_id
+        # 中文注释：评论者用户ID改为字符串（openid）
+        self.commenter_user_id: str = commenter_user_id
         self.commenter_user_name: str = commenter_user_name
 
         # 互动数据
         self.like_count: int = 0
-        self.liked_user_ids: List[int] = []
+        # 中文注释：点赞用户ID列表改为字符串列表
+        self.liked_user_ids: List[str] = []
 
         # 状态与时间
         self.comment_status: str = "published"
@@ -93,7 +95,7 @@ class Comment:
             logger.error(f"Error saving comment {self.comment_id}: {e}")
             return False
 
-    async def add_like(self, user_id: int) -> bool:
+    async def add_like(self, user_id: str) -> bool:
         """添加点赞"""
         if user_id not in self.liked_user_ids:
             self.liked_user_ids.append(user_id)
@@ -101,7 +103,7 @@ class Comment:
             return await self.save_to_database()
         return True
 
-    async def remove_like(self, user_id: int) -> bool:
+    async def remove_like(self, user_id: str) -> bool:
         """取消点赞"""
         if user_id in self.liked_user_ids:
             self.liked_user_ids.remove(user_id)

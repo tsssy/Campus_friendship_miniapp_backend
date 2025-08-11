@@ -4,7 +4,7 @@ from datetime import datetime
 
 class GetAIHistoryRequest(BaseModel):
     """获取AI聊天历史请求模型"""
-    user_id: int = Field(..., description="用户ID", ge=1)
+    user_id: str = Field(..., description="用户ID（字符串）")
 
 class GetAIHistoryResponse(BaseModel):
     """获取AI聊天历史响应模型"""
@@ -16,12 +16,12 @@ class AIHistoryItem(BaseModel):
     """AI聊天历史单项模型"""
     message_content: str = Field(..., description="消息内容")
     message_send_time_in_utc: str = Field(..., description="ISO格式时间字符串")
-    message_sender_id: int = Field(..., description="发送者ID")
+    message_sender_id: str = Field(..., description="发送者ID（字符串）")
     display_name: str = Field(..., description="显示名称") 
 
 class ChatRequest(BaseModel):
     """AI聊天请求模型"""
-    user_id: int = Field(..., description="用户ID", ge=1)
+    user_id: str = Field(..., description="用户ID（字符串）")
     message: str = Field(..., description="用户消息")
 
 class ChatResponse(BaseModel):

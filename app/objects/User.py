@@ -12,6 +12,10 @@ class User:
         self.user_personality_summary = None
         self.match_ids = []  # type: list[int]
         self.blocked_user_ids = []  # type: list[int]
+        
+        # 论坛相关字段（新增）
+        self.post_ids = []           # type: list[int] - 用户发布的帖子ID列表
+        self.liked_post_ids = []     # type: list[int] - 用户点赞的帖子ID列表
 
     def edit_data(self, telegram_user_name=None, gender=None, age=None, target_gender=None, user_personality_summary=None):
         """编辑用户数据"""
@@ -36,3 +40,24 @@ class User:
     def like_match(self, match_id):
         if match_id not in self.match_ids:
             self.match_ids.append(match_id)
+            
+    # 论坛相关方法（新增）
+    def add_post(self, post_id: int):
+        """添加用户发布的帖子ID"""
+        if post_id not in self.post_ids:
+            self.post_ids.append(post_id)
+            
+    def remove_post(self, post_id: int):
+        """移除用户发布的帖子ID"""
+        if post_id in self.post_ids:
+            self.post_ids.remove(post_id)
+            
+    def add_liked_post(self, post_id: int):
+        """添加用户点赞的帖子ID"""
+        if post_id not in self.liked_post_ids:
+            self.liked_post_ids.append(post_id)
+            
+    def remove_liked_post(self, post_id: int):
+        """移除用户点赞的帖子ID"""
+        if post_id in self.liked_post_ids:
+            self.liked_post_ids.remove(post_id)

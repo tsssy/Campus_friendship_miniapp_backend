@@ -67,6 +67,14 @@ class SingletonStatusReporter:
         except Exception as e:
             status["ChatroomManager"] = {"error": str(e)}
         
+        # ForumManager 状态（新增，可选）
+        try:
+            from app.services.https.ForumManager import ForumManager
+            _ = ForumManager()
+            status["ForumManager"] = {"initialized": True}
+        except Exception as e:
+            status["ForumManager"] = {"error": str(e)}
+        
         return status
     
     @staticmethod

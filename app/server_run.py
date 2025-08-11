@@ -483,6 +483,18 @@ async def auto_save_to_database():
             except Exception as e:
                 logger.error(f"❌ PersonalityTestManager数据保存失败: {e}")
             
+            # 保存ForumManager数据（新增论坛功能）
+            try:
+                from app.services.https.ForumManager import ForumManager
+                forum_manager = ForumManager()
+                forum_save_success = await forum_manager.save_to_database()  # 保存论坛数据到数据库
+                if forum_save_success:
+                    logger.info("✅ ForumManager数据保存成功")
+                else:
+                    logger.warning("⚠️ ForumManager数据保存部分失败")
+            except Exception as e:
+                logger.error(f"❌ ForumManager数据保存失败: {e}")
+            
             elapsed_time = time.time() - start_time
             logger.info(f"🔄 自动保存完成，耗时: {elapsed_time:.3f}秒")
             
@@ -555,6 +567,13 @@ async def lifespan(app: FastAPI):
         personality_manager = PersonalityTestManager()
         await personality_manager.initialize_from_database()  # 从数据库加载数据到内存
         logger.info("PersonalityTestManager初始化完成")
+
+        # 初始化ForumManager
+        logger.info("正在初始化ForumManager...")
+        from app.services.https.ForumManager import ForumManager
+        forum_manager = ForumManager()
+        await forum_manager.initialize()  # 从数据库加载数据到内存
+        logger.info("ForumManager初始化完成")
         
         # 启动自动保存任务
         logger.info("正在启动自动保存后台任务...")
@@ -597,6 +616,15 @@ async def lifespan(app: FastAPI):
         ai_processor = AIResponseProcessor()
         await ai_processor.save_to_database()
         logger.info("最终AI聊天数据保存完成")
+        
+        # 保存ForumManager数据
+        try:
+            from app.services.https.ForumManager import ForumManager
+            forum_manager = ForumManager()
+            await forum_manager.save_to_database()
+            logger.info("最终论坛数据保存完成")
+        except Exception as e:
+            logger.error(f"最终论坛数据保存失败: {e}")
     except Exception as e:
         logger.error(f"最终数据保存失败: {e}")
     
@@ -766,19 +794,21 @@ for ws_router in all_ws_routers:
     app.include_router(ws_router)
 logger.info(f"WebSocket路由已注册")
 
-# 添加 CORS 中间件，只允许特定来源
+# 添加 CORS 中间件，允许本地开发环境访问
 cors_origins = [
-    "https://cupid-yukio-frontend.vercel.app",  # 生产环境前端地址
-    "https://cupid-yukio-frontend-test.vercel.app",
-    "http://localhost:5173",  # 本地开发环境前端地址
-    "http://127.0.0.1:5173",  # 本地IP地址
+    "http://localhost:3000",    # React开发服务器
+    "http://localhost:5173",    # Vite开发服务器
+    "http://127.0.0.1:3000",   # React本地IP
+    "http://127.0.0.1:5173",   # Vite本地IP
+    "http://localhost:8080",    # 其他本地端口
+    "http://127.0.0.1:8080",   # 其他本地IP
 ]
 
 logger.info(f"CORS允许的域名: {cors_origins}")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 允许所有源头
+    allow_origins=["*"],  # 本地开发时允许所有源头
     allow_credentials=True,
     allow_methods=["*"],  # 允许所有 HTTP 方法
     allow_headers=["*"],  # 允许所有请求头
@@ -792,21 +822,21 @@ async def root():
 if __name__ == "__main__":
     logger.info(f"启动服务器: {settings.PROJECT_NAME} v{settings.VERSION}")
     
-    # 生产环境配置 - 服务器环境
+    # 本地测试配置 - 本地环境
     uvicorn_config = {
         "app": "app.server_run:app",
-        "host": "0.0.0.0",
-        "port": 8000,
-        "reload": False,
+        "host": "127.0.0.1",  # 本地地址
+        "port": 8000,          # 本地端口
+        "reload": True,        # 开发模式自动重载
         "workers": 1
     }
 
-    # 本地测试配置 - 注释掉，使用生产环境配置
+    # 生产环境配置 - 服务器环境（注释掉）
     # uvicorn_config = {
     #     "app": "app.server_run:app",
-    #     "host": "127.0.0.1",
-    #     "port": 8001,
-    #     "reload": True,
+    #     "host": "0.0.0.0",
+    #     "port": 8000,
+    #     "reload": False,
     #     "workers": 1
     # }
     

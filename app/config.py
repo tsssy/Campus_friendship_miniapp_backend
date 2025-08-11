@@ -16,7 +16,7 @@ class Settings:
 
     # MongoDB配置 - 本地测试环境配置
     MONGODB_URL: str = os.getenv("MONGODB_URL", "mongodb://localhost:27017")
-    MONGODB_DB_NAME: str = os.getenv("MONGODB_DB_NAME", "local_test_db")
+    MONGODB_DB_NAME: str = os.getenv("MONGODB_DB_NAME", "campus_friendship_db")
     MONGODB_USERNAME: str = os.getenv("MONGODB_USERNAME", "")
     MONGODB_PASSWORD: str = os.getenv("MONGODB_PASSWORD", "")
     MONGODB_AUTH_SOURCE: str = os.getenv("MONGODB_AUTH_SOURCE", "")

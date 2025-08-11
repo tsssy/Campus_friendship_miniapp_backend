@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from app.api.v1 import UserManagement, MatchManager, ChatroomManager
 from app.api.v1.AIResponseProcessor import router as AIResponseProcessor_router
 from app.api.v1.PersonalityTest import router as PersonalityTest_router
+from app.api.v1.ForumManager import router as ForumManager_router
 
 api_router = APIRouter()
 
@@ -18,4 +19,7 @@ api_router.include_router(ChatroomManager.router, prefix="/ChatroomManager", tag
 api_router.include_router(AIResponseProcessor_router)
 
 # 注册抽卡游戏相关路由 - 避免与现有路由冲突
-api_router.include_router(PersonalityTest_router) 
+api_router.include_router(PersonalityTest_router)
+
+# 注册论坛相关路由（已在路由内声明前缀，这里不再重复）
+api_router.include_router(ForumManager_router)

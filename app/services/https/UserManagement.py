@@ -50,6 +50,10 @@ class UserManagement:
             user.match_ids = user_data.get("match_ids", [])
             user.blocked_user_ids = user_data.get("blocked_user_ids", [])
             
+            # 论坛相关字段（新增）
+            user.post_ids = user_data.get("post_ids", [])           # 用户发布的帖子ID列表
+            user.liked_post_ids = user_data.get("liked_post_ids", []) # 用户点赞的帖子ID列表
+            
             # 添加到缓存列表
             user_id = user.user_id
             self.user_list[user_id] = user
@@ -133,6 +137,9 @@ class UserManagement:
                         "user_personality_summary": user.user_personality_summary,
                         "match_ids": user.match_ids,
                         "blocked_user_ids": user.blocked_user_ids,
+                        # 论坛相关字段（新增）
+                        "post_ids": user.post_ids,           # 用户发布的帖子ID列表
+                        "liked_post_ids": user.liked_post_ids, # 用户点赞的帖子ID列表
                     }
 
                     # 检查用户是否已在数据库中
@@ -175,6 +182,9 @@ class UserManagement:
                 "user_personality_summary": user.user_personality_summary,
                 "match_ids": user.match_ids,
                 "blocked_user_ids": user.blocked_user_ids,
+                # 论坛相关字段（新增）
+                "post_ids": user.post_ids,           # 用户发布的帖子ID列表
+                "liked_post_ids": user.liked_post_ids, # 用户点赞的帖子ID列表
             }
 
             # 检查用户是否已在数据库中

@@ -12,7 +12,7 @@ class MediaFile(BaseModel):
 
 
 class CreatorInfo(BaseModel):
-    user_id: int = Field(..., description="创建者用户ID")
+    user_id: str = Field(..., description="创建者用户ID（字符串）")
     user_name: str = Field(..., description="创建者用户名")
 
 
@@ -40,7 +40,7 @@ class PostItem(BaseModel):
 
 # 2.1.1 获取帖子列表
 class GetPostsListRequest(BaseModel):
-    user_id: int = Field(..., description="用户ID")
+    user_id: str = Field(..., description="用户ID（字符串）")
     sort_type: str = Field("latest", description="排序类型：latest/hot")
     page: int = Field(1, ge=1)
     page_size: int = Field(20, ge=1, le=100)
@@ -54,7 +54,7 @@ class GetPostsListResponse(BaseModel):
 
 # 2.1.2 发布新帖子
 class CreatePostRequest(BaseModel):
-    creator_user_id: int = Field(..., description="创建者用户ID")
+    creator_user_id: str = Field(..., description="创建者用户ID（字符串）")
     post_content: str = Field(..., description="帖子内容")
     post_type: str = Field("text", description="帖子类型：text/image/text_image")
     post_category: Optional[str] = Field("", description="帖子分类")
@@ -70,7 +70,7 @@ class CreatePostResponse(BaseModel):
 
 # 2.1.3 搜索帖子
 class SearchPostsRequest(BaseModel):
-    user_id: int
+    user_id: str
     search_query: str
     page: int = 1
     page_size: int = 20
@@ -84,7 +84,7 @@ class SearchPostsResponse(BaseModel):
 
 # 2.1.4 帖子点赞/取消点赞
 class TogglePostLikeRequest(BaseModel):
-    user_id: int
+    user_id: str
     post_id: int
     action: str = Field(..., description="like 或 unlike")
 
@@ -99,7 +99,7 @@ class TogglePostLikeResponse(BaseModel):
 
 # 2.1.5 发布评论
 class CreateCommentRequest(BaseModel):
-    user_id: int
+    user_id: str
     post_id: int
     comment_content: str
 
@@ -113,7 +113,7 @@ class CreateCommentResponse(BaseModel):
 # 2.1.6 获取帖子评论列表
 class GetPostCommentsRequest(BaseModel):
     post_id: int
-    user_id: int
+    user_id: str
     page: int = 1
     page_size: int = 20
 
@@ -135,7 +135,7 @@ class GetPostCommentsResponse(BaseModel):
 
 # 2.1.7 评论点赞/取消点赞
 class ToggleCommentLikeRequest(BaseModel):
-    user_id: int
+    user_id: str
     comment_id: int
     action: str = Field(..., description="like 或 unlike")
 
@@ -151,7 +151,7 @@ class ToggleCommentLikeResponse(BaseModel):
 # 2.1.8 获取帖子详情（新增）
 class GetPostDetailRequest(BaseModel):
     """获取单个帖子详情的请求体"""
-    user_id: int = Field(..., description="请求者用户ID（用于计算是否已点赞）")
+    user_id: str = Field(..., description="请求者用户ID（用于计算是否已点赞，字符串）")
     post_id: int = Field(..., description="帖子ID")
 
 

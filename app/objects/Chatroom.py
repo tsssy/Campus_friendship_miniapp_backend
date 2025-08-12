@@ -49,6 +49,7 @@ class Chatroom:
         Chatroom._chatroom_counter += 1
         self.chatroom_id = Chatroom._chatroom_counter
         self.message_ids = []
+        # 中文注释：聊天室中的用户ID改为字符串（openid）
         self.user1_id = user1.user_id
         self.user2_id = user2.user_id
         self.match_id = match_id  # 添加match_id属性

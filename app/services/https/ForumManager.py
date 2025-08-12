@@ -81,7 +81,7 @@ class ForumManager:
                     if post_id:
                         # 重建Post实例
                         post = Post(
-                            creator_user_id=post_data.get("creator_user_id"),
+                            creator_user_id=str(post_data.get("creator_user_id")),
                             creator_user_name=post_data.get("creator_user_name", ""),
                             post_content=post_data.get("post_content", ""),
                             post_type=post_data.get("post_type", "text"),
@@ -93,7 +93,8 @@ class ForumManager:
                         Post._post_counter = max(Post._post_counter, int(post_id))
                         post.post_id = int(post_id)
                         post.like_count = int(post_data.get("like_count", 0))
-                        post.liked_user_ids = list(post_data.get("liked_user_ids", []))
+                        # 中文注释：liked_user_ids 改为字符串列表
+                        post.liked_user_ids = [str(uid) for uid in list(post_data.get("liked_user_ids", []))]
                         post.comment_count = int(post_data.get("comment_count", 0))
                         post.view_count = int(post_data.get("view_count", 0))
                         post.comment_ids = list(post_data.get("comment_ids", []))
@@ -130,7 +131,7 @@ class ForumManager:
                     if comment_id:
                         # 重建Comment实例
                         comment = Comment(
-                            commenter_user_id=comment_data.get("commenter_user_id"),
+                            commenter_user_id=str(comment_data.get("commenter_user_id")),
                             commenter_user_name=comment_data.get("commenter_user_name", ""),
                             post_id=comment_data.get("post_id"),
                             comment_content=comment_data.get("comment_content", ""),
@@ -139,7 +140,8 @@ class ForumManager:
                         Comment._comment_counter = max(Comment._comment_counter, int(comment_id))
                         comment.comment_id = int(comment_id)
                         comment.like_count = int(comment_data.get("like_count", 0))
-                        comment.liked_user_ids = list(comment_data.get("liked_user_ids", []))
+                        # 中文注释：liked_user_ids 改为字符串列表
+                        comment.liked_user_ids = [str(uid) for uid in list(comment_data.get("liked_user_ids", []))]
                         comment.comment_status = comment_data.get("comment_status", "published")
                         comment.created_at = self._ensure_aware_datetime(comment_data.get("created_at"))
                         
@@ -160,7 +162,7 @@ class ForumManager:
     # ==================== 帖子相关 ====================
     async def create_post(
         self,
-        creator_user_id: int,
+        creator_user_id: str,
         post_content: str,
         post_type: str,
         post_category: str,
@@ -174,7 +176,7 @@ class ForumManager:
                 await self.initialize()
                 
             user_manager = UserManagement()
-            user = user_manager.get_user_instance(creator_user_id)
+            user = user_manager.get_user_instance(str(creator_user_id))
             if not user:
                 logger.error(f"User {creator_user_id} not found when creating post")
                 return None
@@ -220,7 +222,7 @@ class ForumManager:
 
     async def get_posts_list(
         self,
-        user_id: int,
+        user_id: str,
         sort_type: str,
         page: int,
         page_size: int,
@@ -267,7 +269,7 @@ class ForumManager:
             page_posts = published_posts[skip:end_index]
 
             # 预取用户点赞集合（用于 is_liked）
-            user_doc = await Database.find_one("users", {"_id": user_id})
+            user_doc = await Database.find_one("users", {"_id": str(user_id)})
             liked_post_ids = set(user_doc.get("liked_post_ids", [])) if user_doc else set()
 
             posts: List[Dict[str, Any]] = []
@@ -304,7 +306,7 @@ class ForumManager:
             logger.error(f"get_posts_list error: {e}")
             return {"success": False, "posts": [], "has_more": False}
 
-    async def toggle_post_like(self, user_id: int, post_id: int, action: str) -> Dict[str, Any]:
+    async def toggle_post_like(self, user_id: str, post_id: int, action: str) -> Dict[str, Any]:
         """帖子点赞/取消点赞"""
         try:
             # 确保已初始化
@@ -318,17 +320,17 @@ class ForumManager:
 
             if action == "like":
                 # 只更新内存，不写数据库
-                if user_id not in post.liked_user_ids:
-                    post.liked_user_ids.append(user_id)
+                if str(user_id) not in post.liked_user_ids:
+                    post.liked_user_ids.append(str(user_id))
                     post.like_count += 1
                     post.updated_at = datetime.now(timezone.utc)
                 # 更新数据库
-                modified_count = await Database.update_one("users", {"_id": user_id}, {"$addToSet": {"liked_post_ids": post_id}})
+                modified_count = await Database.update_one("users", {"_id": str(user_id)}, {"$addToSet": {"liked_post_ids": post_id}})
                 
                 if modified_count > 0:
                     # 同步更新内存中的用户对象
                     user_manager = UserManagement()
-                    user = user_manager.get_user_instance(user_id)
+                    user = user_manager.get_user_instance(str(user_id))
                     if user:
                         user.add_liked_post(post_id)
                         logger.info(f"用户 {user_id} 的 liked_post_ids 已更新，添加帖子 {post_id}")
@@ -340,17 +342,17 @@ class ForumManager:
                 is_liked = True
             else:
                 # 只更新内存，不写数据库
-                if user_id in post.liked_user_ids:
-                    post.liked_user_ids.remove(user_id)
+                if str(user_id) in post.liked_user_ids:
+                    post.liked_user_ids.remove(str(user_id))
                     post.like_count = max(0, post.like_count - 1)
                     post.updated_at = datetime.now(timezone.utc)
                 # 更新数据库
-                modified_count = await Database.update_one("users", {"_id": user_id}, {"$pull": {"liked_post_ids": post_id}})
+                modified_count = await Database.update_one("users", {"_id": str(user_id)}, {"$pull": {"liked_post_ids": post_id}})
                 
                 if modified_count > 0:
                     # 同步更新内存中的用户对象
                     user_manager = UserManagement()
-                    user = user_manager.get_user_instance(user_id)
+                    user = user_manager.get_user_instance(str(user_id))
                     if user:
                         user.remove_liked_post(post_id)
                         logger.info(f"用户 {user_id} 的 liked_post_ids 已更新，移除帖子 {post_id}")
@@ -366,7 +368,7 @@ class ForumManager:
             logger.error(f"toggle_post_like error: {e}")
             return {"success": False, "message": str(e)}
 
-    async def search_posts(self, user_id: int, search_query: str, page: int, page_size: int) -> Dict[str, Any]:
+    async def search_posts(self, user_id: str, search_query: str, page: int, page_size: int) -> Dict[str, Any]:
         """搜索帖子（最简：content 文本匹配 + 标签匹配）"""
         try:
             # 确保已初始化
@@ -393,7 +395,7 @@ class ForumManager:
             )
             page_posts = matched_posts[skip:end_index]
 
-            user_doc = await Database.find_one("users", {"_id": user_id})
+            user_doc = await Database.find_one("users", {"_id": str(user_id)})
             liked_post_ids = set(user_doc.get("liked_post_ids", [])) if user_doc else set()
 
             posts: List[Dict[str, Any]] = []
@@ -429,7 +431,7 @@ class ForumManager:
             return {"success": False, "posts": [], "has_more": False}
 
     # ==================== 评论相关 ====================
-    async def get_post_detail(self, user_id: int, post_id: int) -> Dict[str, Any]:
+    async def get_post_detail(self, user_id: str, post_id: int) -> Dict[str, Any]:
         """获取单个帖子详情（内存优先）"""
         try:
             if not ForumManager._initialized:
@@ -439,7 +441,7 @@ class ForumManager:
             if not post:
                 return {"success": False, "post": None, "message": "post not found"}
 
-            user_doc = await Database.find_one("users", {"_id": user_id})
+            user_doc = await Database.find_one("users", {"_id": str(user_id)})
             liked_post_ids = set(user_doc.get("liked_post_ids", [])) if user_doc else set()
 
             post_item = {
@@ -464,7 +466,7 @@ class ForumManager:
         except Exception as e:
             logger.error(f"get_post_detail error: {e}")
             return {"success": False, "post": None, "message": "internal error"}
-    async def create_comment(self, user_id: int, post_id: int, comment_content: str) -> Dict[str, Any]:
+    async def create_comment(self, user_id: str, post_id: int, comment_content: str) -> Dict[str, Any]:
         """发布评论（极简）"""
         try:
             # 确保已初始化
@@ -472,7 +474,7 @@ class ForumManager:
                 await self.initialize()
                 
             user_manager = UserManagement()
-            user = user_manager.get_user_instance(user_id)
+            user = user_manager.get_user_instance(str(user_id))
             if not user:
                 return {"success": False, "message": "user not found"}
 
@@ -500,7 +502,7 @@ class ForumManager:
             logger.error(f"create_comment error: {e}")
             return {"success": False, "message": str(e)}
 
-    async def get_post_comments(self, post_id: int, user_id: int, page: int, page_size: int) -> Dict[str, Any]:
+    async def get_post_comments(self, post_id: int, user_id: str, page: int, page_size: int) -> Dict[str, Any]:
         """获取评论列表（极简）"""
         try:
             skip = max(0, (page - 1) * page_size)
@@ -525,7 +527,7 @@ class ForumManager:
                             "user_name": comment.commenter_user_name,
                         },
                         "like_count": comment.like_count,
-                        "is_liked": user_id in set(comment.liked_user_ids),
+                        "is_liked": str(user_id) in set(comment.liked_user_ids),
                         "created_at": comment.created_at,
                     }
                 )
@@ -537,7 +539,7 @@ class ForumManager:
             logger.error(f"get_post_comments error: {e}")
             return {"success": False, "comments": [], "has_more": False}
 
-    async def toggle_comment_like(self, user_id: int, comment_id: int, action: str) -> Dict[str, Any]:
+    async def toggle_comment_like(self, user_id: str, comment_id: int, action: str) -> Dict[str, Any]:
         """评论点赞/取消点赞"""
         try:
             # 确保已初始化
@@ -551,14 +553,14 @@ class ForumManager:
 
             if action == "like":
                 # 只更新内存，不写数据库
-                if user_id not in comment.liked_user_ids:
-                    comment.liked_user_ids.append(user_id)
+                if str(user_id) not in comment.liked_user_ids:
+                    comment.liked_user_ids.append(str(user_id))
                     comment.like_count += 1
                 is_liked = True
             else:
                 # 只更新内存，不写数据库
-                if user_id in comment.liked_user_ids:
-                    comment.liked_user_ids.remove(user_id)
+                if str(user_id) in comment.liked_user_ids:
+                    comment.liked_user_ids.remove(str(user_id))
                     comment.like_count = max(0, comment.like_count - 1)
                 is_liked = False
 

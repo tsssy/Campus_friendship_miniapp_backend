@@ -51,6 +51,7 @@ class Message:
         self.message_id = Message._message_counter
         self.message_content = send_content
         self.message_send_time_in_utc = datetime.now(timezone.utc)
+        # 中文注释：消息发送者、接收者ID改为字符串（openid）
         self.message_sender_id = sender_user.user_id
         self.message_receiver_id = receiver_user.user_id
         self.chatroom_id = chatroom_id  # 消息归属的聊天室ID

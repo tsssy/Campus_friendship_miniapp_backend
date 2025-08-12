@@ -76,7 +76,8 @@ class UserManagement:
 
     # 创建新用户 [API调用]
     def create_new_user(self, telegram_user_name, telegram_user_id, gender):
-        user_id = int(telegram_user_id) # 用户id就是tg_id
+        # 中文注释：将用户ID改为字符串（例如微信 openid），不再转换为整数
+        user_id = str(telegram_user_id)
         user = User(telegram_user_name=telegram_user_name, gender=gender, user_id=user_id)
         self.user_list[user_id] = user
         if gender == 1:
@@ -130,7 +131,7 @@ class UserManagement:
                     # 使用 user_id 作为 MongoDB 的 _id
                     user_dict = {
                         "_id": user.user_id,
-                        "telegram_user_name": user.telegram_user_name,
+                        "user_name": user.telegram_user_name,
                         "gender": user.gender,
                         "age": user.age,
                         "target_gender": user.target_gender,
@@ -175,7 +176,7 @@ class UserManagement:
             # 使用 user_id 作为 MongoDB 的 _id
             user_dict = {
                 "_id": user.user_id,
-                "telegram_user_name": user.telegram_user_name,
+                "user_name": user.telegram_user_name,
                 "gender": user.gender,
                 "age": user.age,
                 "target_gender": user.target_gender,
@@ -207,21 +208,19 @@ class UserManagement:
 
     # 根据id获取用户信息 [API调用]
     def get_user_info_with_user_id(self, user_id):
-        # Check if input is string and all numbers, convert to int if so
-        if isinstance(user_id, str) and user_id.isdigit():
-            user_id = int(user_id)
+        # 中文注释：统一按字符串 user_id 处理，不进行数值转换
+        user_id = str(user_id)
         
         user = self.user_list.get(user_id)
         if not user:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="用户不存在")
         return {
-            "telegram_user_name": user.telegram_user_name,
-            "telegram_id": user.user_id,
+            "user_name": user.telegram_user_name,
+            "user_id": user.user_id,
             "gender": user.gender,
             "age": user.age,
             "target_gender": user.target_gender,
             "user_personality_trait": user.user_personality_summary,
-            "user_id": user.user_id,
             "match_ids": user.match_ids
         }
 
@@ -269,9 +268,8 @@ class UserManagement:
         [API调用]
         """
         try:
-            # Convert string to int if needed
-            if isinstance(user_id, str) and user_id.isdigit():
-                user_id = int(user_id)
+            # 中文注释：统一按字符串 user_id 处理
+            user_id = str(user_id)
             
             # Step 1: 检查用户是否存在
             target_user = self.user_list.get(user_id)

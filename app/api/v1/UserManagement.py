@@ -17,9 +17,10 @@ router = APIRouter()
 async def create_new_user(request: CreateNewUserRequest):
     user_manager = UserManagement()
     try:
+        # 中文注释：去除 telegram 前缀，使用通用字段名
         user_id = user_manager.create_new_user(
-            telegram_user_name=request.telegram_user_name,
-            telegram_user_id=request.telegram_user_id,
+            telegram_user_name=request.user_name,
+            telegram_user_id=request.user_id,
             gender=request.gender
         )
         return CreateNewUserResponse(success=True, user_id=user_id)

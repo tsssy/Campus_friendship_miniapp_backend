@@ -28,7 +28,8 @@ class MatchSessionHandler(ConnectionHandler):
         try:
             # 获取N8nWebhookManager实例并请求匹配
             webhook_manager = N8nWebhookManager()
-            user_id_int = int(self.user_id)
+            # 中文注释：下游N8n若支持字符串ID则直接传字符串，否则需同步改造
+            user_id_int = str(self.user_id)
             
             # 请求1个匹配
             matches = await webhook_manager.request_matches(user_id_int, num_of_matches=1)

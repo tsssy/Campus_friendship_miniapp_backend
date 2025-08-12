@@ -22,7 +22,7 @@ class PersonalityTestRecord:
         self.db = get_db()
         self.collection = self.db["personality_test_records"]  # MongoDB集合名称
         
-    async def create_test_session(self, user_id: int) -> Optional[str]:
+    async def create_test_session(self, user_id: str) -> Optional[str]:
         """
         创建新的测试会话
         
@@ -36,7 +36,7 @@ class PersonalityTestRecord:
             session_id = str(uuid.uuid4())
             session_data = {
                 "session_id": session_id,
-                "user_id": user_id,
+                "user_id": str(user_id),
                 "answers": [],
                 "scores": {},
                 "result_card": None,
@@ -200,7 +200,7 @@ class PersonalityTestRecord:
             logger.error(f"检查测试完成状态失败 - session_id: {session_id}, error: {e}")
             return False
     
-    async def get_user_test_history(self, user_id: int, limit: int = 10) -> List[Dict]:
+    async def get_user_test_history(self, user_id: str, limit: int = 10) -> List[Dict]:
         """
         获取用户测试历史记录
         
@@ -213,7 +213,7 @@ class PersonalityTestRecord:
         """
         try:
             cursor = self.collection.find(
-                {"user_id": user_id, "completed": True},
+                {"user_id": str(user_id), "completed": True},
                 {
                     "session_id": 1,
                     "result_card": 1,
@@ -228,7 +228,7 @@ class PersonalityTestRecord:
             logger.error(f"获取用户测试历史失败 - user_id: {user_id}, error: {e}")
             return []
     
-    async def get_user_test_count(self, user_id: int) -> int:
+    async def get_user_test_count(self, user_id: str) -> int:
         """
         获取用户测试总次数
         
@@ -240,7 +240,7 @@ class PersonalityTestRecord:
         """
         try:
             count = await self.collection.count_documents(
-                {"user_id": user_id, "completed": True}
+                {"user_id": str(user_id), "completed": True}
             )
             return count
         except Exception as e:
@@ -291,7 +291,7 @@ class PersonalityTestRecord:
             logger.error(f"清理未完成会话失败: {e}")
             return 0
     
-    async def get_session_by_user_and_status(self, user_id: int, completed: bool) -> Optional[Dict]:
+    async def get_session_by_user_and_status(self, user_id: str, completed: bool) -> Optional[Dict]:
         """
         根据用户ID和完成状态获取最新的会话
         
@@ -304,7 +304,7 @@ class PersonalityTestRecord:
         """
         try:
             session = await self.collection.find_one(
-                {"user_id": user_id, "completed": completed},
+                {"user_id": str(user_id), "completed": completed},
                 sort=[("started_at", pymongo.DESCENDING)]
             )
             

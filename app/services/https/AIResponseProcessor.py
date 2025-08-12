@@ -90,7 +90,7 @@ class AIResponseProcessor:
         except Exception as e:
             logger.error(f"AIResponseProcessor: 从数据库加载AI聊天数据失败: {str(e)}")
     
-    async def get_conversation_history(self, user_id: int) -> List[Tuple[str, str, int, str]]:
+    async def get_conversation_history(self, user_id: str) -> List[Tuple[str, str, str, str]]:
         """
         获取对话历史记录 - 从内存中获取
         
@@ -152,7 +152,7 @@ class AIResponseProcessor:
             logger.error(f"从内存获取用户 {user_id} 的AI聊天历史失败: {str(e)}")
             return []
     
-    async def save_conversation_history(self, user_id: int, message: str, response: str) -> bool:
+    async def save_conversation_history(self, user_id: str, message: str, response: str) -> bool:
         """
         保存用户和AI的对话历史 - 先写内存，后异步写数据库
         
@@ -313,7 +313,7 @@ class AIResponseProcessor:
         logger.warning(f"总结分割失败，返回原文: {response_text[:100]}...")
         return [response_text]
     
-    async def save_to_database(self, user_id: Optional[int] = None):
+    async def save_to_database(self, user_id: Optional[str] = None):
         """
         保存AI聊天数据到数据库
         如果指定了user_id，则保存该用户的聊天数据；如果没有指定，则保存所有内存中的聊天数据。
@@ -436,7 +436,7 @@ class AIResponseProcessor:
         """
         await self.initialize_from_database()
     
-    def add_message_to_memory(self, user_id: int, message_id: int, message_data: dict):
+    def add_message_to_memory(self, user_id: str, message_id: int, message_data: dict):
         """
         添加消息到内存 [内部方法]
         

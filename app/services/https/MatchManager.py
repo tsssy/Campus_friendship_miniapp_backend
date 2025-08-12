@@ -52,8 +52,8 @@ class MatchManager:
                     
                     # 创建Match实例
                     match = Match(
-                        telegram_user_session_id_1=user_id_1,
-                        telegram_user_session_id_2=user_id_2,
+                        telegram_user_session_id_1=str(user_id_1),
+                        telegram_user_session_id_2=str(user_id_2),
                         reason_to_id_1=match_data.get("description_to_user_1", ""),
                         reason_to_id_2=match_data.get("description_to_user_2", ""),
                         match_score=match_data.get("match_score", 0),
@@ -87,15 +87,15 @@ class MatchManager:
             logger.error(f"MatchManager construct: Error constructing MatchManager: {e}")
             return False
 
-    async def create_match(self, user_id_1: int, user_id_2: int, reason_1: str, reason_2: str, match_score: int) -> Match:
+    async def create_match(self, user_id_1: str, user_id_2: str, reason_1: str, reason_2: str, match_score: int) -> Match:
         """
         创建新的匹配
         """
         try:
             # Create new match instance
             new_match = Match(
-                telegram_user_session_id_1=user_id_1,
-                telegram_user_session_id_2=user_id_2,
+                telegram_user_session_id_1=str(user_id_1),
+                telegram_user_session_id_2=str(user_id_2),
                 reason_to_id_1=reason_1,
                 reason_to_id_2=reason_2,
                 match_score=match_score,
@@ -109,8 +109,8 @@ class MatchManager:
             from app.services.https.UserManagement import UserManagement
             user_manager = UserManagement()
             
-            user_1 = user_manager.get_user_instance(user_id_1)
-            user_2 = user_manager.get_user_instance(user_id_2)
+            user_1 = user_manager.get_user_instance(str(user_id_1))
+            user_2 = user_manager.get_user_instance(str(user_id_2))
             
             if user_1:
                 if new_match.match_id not in user_1.match_ids:
@@ -203,7 +203,7 @@ class MatchManager:
             logger.error(f"Error saving matches to database: {e}")
             return False
 
-    def get_match_info(self, user_id: int, match_id: int) -> Optional[Dict[str, Any]]:
+    def get_match_info(self, user_id: str, match_id: int) -> Optional[Dict[str, Any]]:
         """
         获取匹配信息，返回对特定用户的视图
         """
@@ -214,13 +214,13 @@ class MatchManager:
                 return None
             
             # Get target user ID
-            target_user_id = match.get_target_user_id(user_id)
+            target_user_id = match.get_target_user_id(str(user_id))
             if target_user_id is None:
                 logger.error(f"User {user_id} not found in match {match_id}")
                 return None
             
             # Get description for the requesting user
-            description_for_user = match.get_reason_for_profile(user_id)
+            description_for_user = match.get_reason_for_profile(str(user_id))
             
             match_info = {
                 "target_user_id": target_user_id,
@@ -238,7 +238,7 @@ class MatchManager:
             logger.error(f"Error getting match info for user {user_id} in match {match_id}: {e}")
             return None
     
-    def get_user_matches(self, user_id: int) -> list[Match]:
+    def get_user_matches(self, user_id: str) -> list[Match]:
         """
         获取用户的所有匹配
         """

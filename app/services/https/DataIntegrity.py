@@ -67,8 +67,9 @@ class DataIntegrity:
             
             # 第一步：轮询MatchManager里的每一个Match实例，检查用户是否存在
             for match_id, match in self.match_manager.match_list.items():
-                user_1_exists = self.user_manager.get_user_instance(match.user_id_1) is not None
-                user_2_exists = self.user_manager.get_user_instance(match.user_id_2) is not None
+                # 中文注释：用户ID统一为字符串
+                user_1_exists = self.user_manager.get_user_instance(str(match.user_id_1)) is not None
+                user_2_exists = self.user_manager.get_user_instance(str(match.user_id_2)) is not None
                 
                 # 检查两个用户是否都存在
                 if not user_1_exists or not user_2_exists:
@@ -97,7 +98,7 @@ class DataIntegrity:
                 user_id_2 = match.user_id_2
                 
                 # 检查user1的match_ids
-                user_1 = self.user_manager.get_user_instance(user_id_1)
+                user_1 = self.user_manager.get_user_instance(str(user_id_1))
                 if user_1 and match_id not in user_1.match_ids:
                     user_1.match_ids.append(match_id)
                     await self.user_manager.save_to_database(user_id_1)
@@ -105,7 +106,7 @@ class DataIntegrity:
                     logger.info(f"为用户 {user_id_1} 添加缺失的match_id: {match_id}")
                 
                 # 检查user2的match_ids
-                user_2 = self.user_manager.get_user_instance(user_id_2)
+                user_2 = self.user_manager.get_user_instance(str(user_id_2))
                 if user_2 and match_id not in user_2.match_ids:
                     user_2.match_ids.append(match_id)
                     await self.user_manager.save_to_database(user_id_2)
@@ -171,7 +172,7 @@ class DataIntegrity:
             invalid_chatroom_ids = []
             
             # 获取所有存在的user_ids和match_ids
-            existing_user_ids = set(self.user_manager.user_list.keys())
+            existing_user_ids = set(str(uid) for uid in self.user_manager.user_list.keys())
             existing_match_ids = set(self.match_manager.match_list.keys())
             
             # 轮询ChatroomManager内存中的所有chatroom
@@ -179,11 +180,11 @@ class DataIntegrity:
                 is_invalid = False
                 
                 # 检查chatroom中的user1_id和user2_id是否存在
-                if chatroom.user1_id not in existing_user_ids:
+                if str(chatroom.user1_id) not in existing_user_ids:
                     logger.warning(f"Chatroom {chatroom_id} 包含不存在的user1_id: {chatroom.user1_id}")
                     is_invalid = True
                 
-                if chatroom.user2_id not in existing_user_ids:
+                if str(chatroom.user2_id) not in existing_user_ids:
                     logger.warning(f"Chatroom {chatroom_id} 包含不存在的user2_id: {chatroom.user2_id}")
                     is_invalid = True
                 
@@ -309,7 +310,7 @@ class DataIntegrity:
             logger.info("开始最终数据库Message完备性检查...")
             
             # 获取所有存在的user_ids和chatroom_ids
-            existing_user_ids = set(self.user_manager.user_list.keys())
+            existing_user_ids = set(str(uid) for uid in self.user_manager.user_list.keys())
             existing_chatroom_ids = set(self.chatroom_manager.chatrooms.keys())
             
             # 获取数据库中所有message数据
@@ -325,12 +326,12 @@ class DataIntegrity:
                 is_invalid = False
                 
                 # 检查message_sender_id是否存在
-                if sender_id and sender_id not in existing_user_ids:
+                if sender_id and str(sender_id) not in existing_user_ids:
                     logger.warning(f"Message {message_id} 包含不存在的message_sender_id: {sender_id}")
                     is_invalid = True
                 
                 # 检查message_receiver_id是否存在
-                if receiver_id and receiver_id not in existing_user_ids:
+                if receiver_id and str(receiver_id) not in existing_user_ids:
                     logger.warning(f"Message {message_id} 包含不存在的message_receiver_id: {receiver_id}")
                     is_invalid = True
                 

@@ -3,8 +3,8 @@ from typing import Optional, List, Tuple
 
 # Get or create chatroom
 class GetOrCreateChatroomRequest(BaseModel):
-    user_id_1: int = Field(..., description="第一个用户的ID")
-    user_id_2: int = Field(..., description="第二个用户的ID")
+    user_id_1: str = Field(..., description="第一个用户的ID（字符串）")
+    user_id_2: str = Field(..., description="第二个用户的ID（字符串）")
     match_id: int = Field(..., description="匹配ID")
 
 class GetOrCreateChatroomResponse(BaseModel):
@@ -14,7 +14,7 @@ class GetOrCreateChatroomResponse(BaseModel):
 # Get chat history
 class GetChatHistoryRequest(BaseModel):
     chatroom_id: int = Field(..., description="聊天室ID")
-    user_id: int = Field(..., description="请求用户的ID")
+    user_id: str = Field(..., description="请求用户的ID（字符串）")
 
 class ChatMessage(BaseModel):
     sender_name: str = Field(..., description="发送者名称或'I'")
@@ -35,7 +35,7 @@ class SaveChatroomHistoryResponse(BaseModel):
 # Send message
 class SendMessageRequest(BaseModel):
     chatroom_id: int = Field(..., description="聊天室ID")
-    sender_user_id: int = Field(..., description="发送者用户ID")
+    sender_user_id: str = Field(..., description="发送者用户ID（字符串）")
     message_content: str = Field(..., description="消息内容")
 
 class SendMessageResponse(BaseModel):
